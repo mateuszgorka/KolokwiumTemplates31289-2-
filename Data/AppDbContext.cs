@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CourseStudent.Models;
+using Microsoft.EntityFrameworkCore;
+ 
 
 namespace CourseStudent.Data;
 

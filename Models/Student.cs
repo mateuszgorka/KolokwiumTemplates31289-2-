@@ -1,4 +1,6 @@
-﻿public class Student
+﻿using CourseStudent.Models;
+
+public class Student
 {
     
     public int Id { get; set; }
