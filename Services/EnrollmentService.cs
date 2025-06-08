@@ -217,6 +217,30 @@ namespace CourseStudent.Services
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<object> UpdateStudentAsync(int studentId, StudentDto dto)
+        {
+            var student = await _context.Students.FindAsync(studentId);
+            if (student == null)
+                return new { message = "Nie ma takiego studenta" };
+
+            student.FirstName = dto.FirstName;
+            student.LastName = dto.LastName;
+            student.Email = dto.Email;
+
+            await _context.SaveChangesAsync();
+
+            return new
+            {
+                
+                student = new
+                {
+                    student.Id,
+                    student.FirstName,
+                    student.LastName,
+                    student.Email
+                }
+            };
+        }
 
         
     }
