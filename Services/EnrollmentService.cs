@@ -177,8 +177,47 @@ namespace CourseStudent.Services
     };
 }
 
-        
-        
+        public async Task<object> DeleteCourseAsync(int courseId)
+        {
+            
+            var course = await _context.Courses     // ---->>> pobieramy dany kurs
+                .Include(c => c.Enrollments)
+                .FirstOrDefaultAsync(c => c.Id == courseId);
+
+            
+            if (course == null)
+                return new { message = "Istnieje dany kurs" };
+
+           
+            _context.Enrollments.RemoveRange(course.Enrollments);
+            _context.Courses.Remove(course);
+
+            
+            await _context.SaveChangesAsync();   // -> zapisywanie zmian w bazie
+
+            
+            return new
+            {
+                message = "Usunieto"
+            };
+        }
+
+        public async Task<bool> DeleteEnrollmentAsync(int studentId, int courseId)
+        {
+            
+            var enrollment = await _context.Enrollments
+                .FirstOrDefaultAsync(e => e.StudentId == studentId && e.CourseId == courseId);   // ----> znajdz id
+
+           
+            if (enrollment == null)    // jesli nie istnieje to false 
+                return false;
+
+           
+            _context.Enrollments.Remove(enrollment);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         
     }
 }

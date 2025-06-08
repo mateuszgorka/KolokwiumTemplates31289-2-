@@ -30,5 +30,13 @@ public class CoursesController : ControllerBase
         var result = await _service.UpdateCourseWithEnrollmentsAsync(id, dto);
         return Ok(result);
     }
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteCourse(int id)
+    {
+        var result = await _service.DeleteCourseAsync(id);
+        return Ok(result);
+    }
 
+    
 }
