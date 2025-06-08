@@ -22,4 +22,13 @@ public class CoursesController : ControllerBase
         var result = await _service.CreateCourseWithEnrollmentsAsync(dto);
         return Ok(result);
     }
+
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateCourseWithEnrollments(int id, [FromBody] CreateCourseWithEnrollmentsDto dto)
+    {
+        var result = await _service.UpdateCourseWithEnrollmentsAsync(id, dto);
+        return Ok(result);
+    }
+
 }

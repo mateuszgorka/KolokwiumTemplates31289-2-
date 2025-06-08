@@ -95,7 +95,6 @@ namespace CourseStudent.Services
 
             return new
             {
-                message = "Kurs został utworzony i studenci zostali zapisani.",
                 course = new
                 {
                     course.Id,
@@ -106,5 +105,80 @@ namespace CourseStudent.Services
                 enrollments
             };
         }
+        
+        public async Task<object> UpdateCourseWithEnrollmentsAsync(int courseId, CreateCourseWithEnrollmentsDto dto)
+{
+    var course = await _context.Courses.Include(c => c.Enrollments).FirstOrDefaultAsync(c => c.Id == courseId);  // -----> kurs o danym id, w sensie ze id wpisane do metody
+    if (course == null) return new { message = "There is no takiego kursu" };
+    
+    
+    course.Title = dto.Title;
+    course.Credits = dto.Credits;
+    course.Teacher = dto.Teacher;
+
+   
+    var oldEnrollments = _context.Enrollments.Where(e => e.CourseId == courseId); // _> delete enrollments
+    _context.Enrollments.RemoveRange(oldEnrollments);
+    await _context.SaveChangesAsync();   // ----> zmiany w bazie
+        
+    var newEnrollments = new List<object>();
+
+    foreach (var studentDto in dto.Students)
+    {
+        var student = await _context.Students  // ->>>>>> szukamy studenta po imimieniu, naziwsku i mailu 
+            .FirstOrDefaultAsync(s =>
+                s.FirstName == studentDto.FirstName &&
+                s.LastName == studentDto.LastName &&
+                s.Email == studentDto.Email);
+
+        if (student == null)
+        {
+            student = new Student  
+            {
+                FirstName = studentDto.FirstName,
+                LastName = studentDto.LastName,
+                Email = studentDto.Email
+            };
+            _context.Students.Add(student);                // ---->> zapisujemuy  nowego studenta
+            await _context.SaveChangesAsync();
+        }
+        
+        
+        // =------> nowy wpis enrollment (zapisywanie)
+        var enrollment = new Enrollment
+        {
+            StudentId = student.Id,
+            CourseId = course.Id,
+            EnrollmentDate = DateTime.UtcNow
+        };
+        _context.Enrollments.Add(enrollment);
+        await _context.SaveChangesAsync();
+
+        newEnrollments.Add(new
+        {
+            studentId = student.Id,
+            student.FirstName,
+            student.LastName,
+            student.Email,
+            enrollmentDate = enrollment.EnrollmentDate
+        });
+    }
+
+    return new
+    {
+        course = new
+        {
+            course.Id,
+            course.Title,
+            course.Credits,
+            course.Teacher
+        },
+        enrollments = newEnrollments
+    };
+}
+
+        
+        
+        
     }
 }
