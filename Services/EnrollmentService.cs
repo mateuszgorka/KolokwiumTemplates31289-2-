@@ -242,6 +242,80 @@ namespace CourseStudent.Services
             };
         }
 
+        public async Task<object> DeleteStudentAsync(int studentId)
+        {
+           
+            var student = await _context.Students
+                .Include(s => s.Enrollments)
+                .FirstOrDefaultAsync(s => s.Id == studentId);
+
+           
+            if (student == null)
+                return new { message = "Brak takiego" };
+
+            
+            _context.Enrollments.RemoveRange(student.Enrollments);
+
+           
+            _context.Students.Remove(student);
+
+            
+            await _context.SaveChangesAsync();
+
+            return new
+            {
+                message = $"Student (ID: {studentId}) i jego zapisy zostały usunięte"
+            };
+        }
         
+        public async Task<object> CreateStudentAsync(StudentDto dto)
+        {
+            
+            var existingStudent = await _context.Students
+                .FirstOrDefaultAsync(s =>
+                    s.FirstName == dto.FirstName &&
+                    s.LastName == dto.LastName &&
+                    s.Email == dto.Email);
+
+            if (existingStudent != null)
+            {
+                return new
+                {
+                    message = "Student już jest",
+                    student = new
+                    {
+                        existingStudent.Id,
+                        existingStudent.FirstName,
+                        existingStudent.LastName,
+                        existingStudent.Email
+                    }
+                };
+            }
+
+            
+            var student = new Student
+            {
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email = dto.Email
+            };
+
+            _context.Students.Add(student);
+            await _context.SaveChangesAsync();
+
+            return new
+            {
+                message = "Student został dodany",
+                student = new
+                {
+                    student.Id,
+                    student.FirstName,
+                    student.LastName,
+                    student.Email
+                }
+            };
+        }
+
+
     }
 }

@@ -27,4 +27,13 @@ public interface IEnrollmentService
     //  PUT /api/students/{studentId}
     //  StudentsController
     Task<object> UpdateStudentAsync(int studentId, StudentDto dto);
+    
+    //  DELETE /api/students/{studentId}
+    //  StudentsController
+    Task<object> DeleteStudentAsync(int studentId);
+    
+    //  POST /api/students
+    //  StudentsController
+    Task<object> CreateStudentAsync(StudentDto dto);
+
 }

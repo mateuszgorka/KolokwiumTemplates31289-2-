@@ -21,4 +21,19 @@ public class StudentsController : ControllerBase
         var result = await _service.UpdateStudentAsync(id, dto);
         return Ok(result);
     }
+    
+    
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteStudent(int id)
+    {
+        var result = await _service.DeleteStudentAsync(id);
+        return Ok(result);
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> CreateStudent([FromBody] StudentDto dto)
+    {
+        var result = await _service.CreateStudentAsync(dto);
+        return Ok(result);
+    }
 }
